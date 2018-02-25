@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_refresh:
                 LoadWeb();
                 break;
-            case R.id.action_lehrer_schueler:
+            case R.id.action_lehrer:
                 Intent openActivityChatIntent = new Intent(MainActivity.this,
                         VertretungsplanLehrerActivity.class);
                 startActivity(openActivityChatIntent);
