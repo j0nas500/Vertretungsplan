@@ -47,9 +47,9 @@ public class VertretungsplanLehrerActivity extends AppCompatActivity {
             case R.id.action_refresh:
                 LoadWeb();
                 break;
-            case R.id.action_lehrer_schueler:
+            case R.id.action_schueler:
                 Intent openActivityChatIntent = new Intent(VertretungsplanLehrerActivity.this,
-                        MainActivty.class);
+                        MainActivity.class);
                 startActivity(openActivityChatIntent);
                 break;
             default:
@@ -71,7 +71,7 @@ public class VertretungsplanLehrerActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.vertretungsplan_menu, menu);
+        inflater.inflate(R.menu.vertretungsplanlehrer_menu, menu);
         return super.onCreateOptionsMenu(menu);
 
     }
