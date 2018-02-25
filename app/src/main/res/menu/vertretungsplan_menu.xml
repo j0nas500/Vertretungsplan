@@ -12,7 +12,7 @@
         android:title="Aktualisieren" />
 
     <item
-        android:id="@+id/action_lehrer-schueler"
+        android:id="@+id/action_lehrer"
         android:orderInCategory="200"
         app:showAsAction="never"
         android:title="Lehrer"/>
