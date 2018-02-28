@@ -10,7 +10,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
@@ -168,9 +167,9 @@ public class MainActivity extends AppCompatActivity {
         String URL = "";
 
         if (Environment._MODE == Environment.VPMode.STUDENT) {
-            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20sch%c3%bcler" + YEAR + "-" + MONTH + "-" + DAY + ".html?";
+            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20sch%C3%BCler" + YEAR + "-" + MONTH + "-" + DAY + ".html";
         } else {
-            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20lehrer" + YEAR + "-" + MONTH + "-" + DAY + ".html?";
+            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20lehrer" + YEAR + "-" + MONTH + "-" + DAY + ".html";
         }
 
         (new Networking()).execute(URL);
@@ -208,13 +207,27 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese Klasse hat Vertretung: "+map["klasse"];
                 */
 
-                sentence = ""; // Sentence wird später angezeigt.
+                //Hinzegefügt von Jonas 28.02.18 23:24
+                map.put("klasse", "9c");
+                map.put("stunde", "1-2");
+                map.put("fach", "Deutsch");
+                map.put("lehrer", "Frau Müller");
+                map.put("raum", "112");
+                map.put("info", "für Mathe Herr Bauer");
+
+                //Lehrer
+                map.put("neues_fach", "Englisch");
+                map.put("fuer_fach", "Mathe");
+                map.put("fuer_lehrer", "Herr Groß");
+
+
+                sentence = "Vertretung: Die Klasse "+map.get("klasse")+" hat in der Stunde "+map.get("stunde")+" im Raum "+map.get("raum")+" "+map.get("fach")+" mit "+map.get("lehrer")+".\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
             } else {
                 /* [ Schlüssel ] | [Wert ]
                      lehrer      - Der vertrende Lehrer
                      stunde      - In welcher Stunde der Lehrer diese Vertretung ausübt
                      klasse      - Mit welcher Klasse er Vertretung hat
-                     neues_fach  - Welches Fach er ausübt
+                     neues_fach  - Welches Fach er ausübt (= Schlüssel: raum)
                      neuer_raum  - Der Raum in dem die Vertretung stattfindet
                      fuer_fach   - Das wach, was die Klasse normalerweise dort hätte
                      fuer_lehrer - Welcher Lehrer ausfällt
@@ -223,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map["lehrer"];
                 */
 
-                sentence = ""; // Sentence wird später angezeigt.
+                sentence = ""+map.get("lehrer")+" hat "+map.get("neues_fach")+" in der Stunde "+map.get("stunde")+" für die "+map.get("klasse")+" im Raum "+map.get("raum")+" statt "+map.get("fuer_fach")+" mit "+map.get("fuer_lehrer")+"."; // Sentence wird später angezeigt.
             }
 
             Environment._VERTRETUNG.add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
