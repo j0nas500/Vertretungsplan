@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map["lehrer"];
                 */
 
-                sentence = ""+map.get("lehrer")+" hat "+map.get("neues_fach")+" in der Stunde "+map.get("stunde")+" für die "+map.get("klasse")+" im Raum "+map.get("raum")+" statt "+map.get("fuer_fach")+" mit "+map.get("fuer_lehrer")+"."; // Sentence wird später angezeigt.
+                sentence = ""+map.get("lehrer")+" hat "+map.get("neues_fach")+" in der Stunde "+map.get("stunde")+" für die "+map.get("klasse")+" im Raum "+map.get("raum")+" statt "+map.get("fuer_fach")+" mit "+map.get("fuer_lehrer")+"."+"\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
             }
 
             Environment._VERTRETUNG.add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
