@@ -140,50 +140,42 @@ public class MainActivity extends AppCompatActivity {
         if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY)
             c.add(Calendar.DAY_OF_YEAR, 2);
 
-        if (Environment._DAY != Environment.VPTime.TODAY)
-        {
+        if (Environment._DAY != Environment.VPTime.TODAY) {
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                 Environment._VERTRETUNG.add("Kann den Vertretungsplan am Freitag noch nicht laden.\nWelcher Administrator soll den bitte heute schon fertig haben?!");
                 adapter.notifyDataSetChanged();
-            }
-            else
+            } else
                 c.add(Calendar.DAY_OF_YEAR, 1);
-        }
-        else
-        {
+        } else {
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
                 c.add(Calendar.DAY_OF_YEAR, 1);
         }
 
         d = c.getTime();
 
-        System.out.println("NEW DATE: "+d);
-        System.out.println(" => "+c.get(Calendar.YEAR)+" "+(c.get(Calendar.MONTH)+1)+" "+c.get(Calendar.DAY_OF_MONTH));
+        System.out.println("NEW DATE: " + d);
+        System.out.println(" => " + c.get(Calendar.YEAR) + " " + (c.get(Calendar.MONTH) + 1) + " " + c.get(Calendar.DAY_OF_MONTH));
 
         String YEAR = Integer.toString(c.get(Calendar.YEAR));
-        String MONTH = Integer.toString(c.get(Calendar.MONTH)+1);
+        String MONTH = Integer.toString(c.get(Calendar.MONTH) + 1);
         String DAY = Integer.toString(c.get(Calendar.DAY_OF_MONTH));
 
         if (c.get(Calendar.MONTH) < 9)
-            MONTH = "0"+MONTH;
+            MONTH = "0" + MONTH;
         if (c.get(Calendar.DAY_OF_MONTH) < 10)
-            DAY = "0"+DAY;
+            DAY = "0" + DAY;
 
         String URL = "";
 
-        if (Environment._MODE == Environment.VPMode.STUDENT)
-        {
-            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20sch%c3%bcler"+YEAR+"-"+MONTH+"-"+DAY+".html?";
-        }
-        else
-        {
-            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20lehrer"+YEAR+"-"+MONTH+"-"+DAY+".html?";
+        if (Environment._MODE == Environment.VPMode.STUDENT) {
+            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20sch%c3%bcler" + YEAR + "-" + MONTH + "-" + DAY + ".html?";
+        } else {
+            URL = "https://files.itslearning.com/data/2226/3/vertretungsplan%20lehrer" + YEAR + "-" + MONTH + "-" + DAY + ".html?";
         }
 
         (new Networking()).execute(URL);
 
-        if (_error)
-        {
+        if (_error) {
             Environment._VERTRETUNG.clear();
             Environment._VERTRETUNG.add("Konnte den Vertretungsplan nicht laden.\nEntweder ist die Verbindung zu schlecht,\ndu hast kein Internet,\noder der Plan existiert nicht mehr.\n\nVielleicht sind auch die Entwickler schuld ;).");
             adapter.notifyDataSetChanged();
@@ -193,54 +185,70 @@ public class MainActivity extends AppCompatActivity {
 
         String t = "Heute";
 
-        if (Environment._DAY == Environment.VPTime.TOMORROW)
-        {
+        if (Environment._DAY == Environment.VPTime.TOMORROW) {
             t = "Morgen";
         }
 
-        Environment._VERTRETUNG.add("Vertretungsplan von "+t+": "+(c.get(Calendar.DAY_OF_MONTH))+"."+(c.get(Calendar.MONTH)+1)+"."+c.get(Calendar.YEAR));
+        Environment._VERTRETUNG.add("Vertretungsplan von " + t + ": " + (c.get(Calendar.DAY_OF_MONTH)) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
 
-        for (Map l : _tmp)
-        {
+        for (Map map : _tmp) {
             System.out.println("=> CHANGE");
-            String s = "";
+            String sentence = "";
 
-            for (Object name : l.keySet()){
-                String key = name.toString();
-                String value = l.get(name).toString();
-                s += (key + " " + value + "\n");
+            if (Environment._MODE == Environment.VPMode.STUDENT) { // Schauen ob "Schüler" asugewählt wurde
+                /* [ Schlüssel ] | [Wert ]
+                     klasse      -
+                     stunde      - In welcher Stunde die Vertretung stattfindet
+                     fach        - das neue Fach
+                     lehrer      - der vertretende Lehrer
+                     raum        - der neue Raum
+                     info        - sonstige Info (meist sowas wie "für ILZ mit XYZ"
+
+                     auf einen dieser Werte zugreifen:  map["<Schlüssel>"]
+                     Beispiel:                          sentence = "Diese Klasse hat Vertretung: "+map["klasse"];
+                */
+
+                sentence = ""; // Sentence wird später angezeigt.
+            } else {
+                /* [ Schlüssel ] | [Wert ]
+                     lehrer      - Der vertrende Lehrer
+                     stunde      - In welcher Stunde der Lehrer diese Vertretung ausübt
+                     klasse      - Mit welcher Klasse er Vertretung hat
+                     neues_fach  - Welches Fach er ausübt
+                     neuer_raum  - Der Raum in dem die Vertretung stattfindet
+                     fuer_fach   - Das wach, was die Klasse normalerweise dort hätte
+                     fuer_lehrer - Welcher Lehrer ausfällt
+
+                     auf einen dieser Werte zugreifen:  map["<Schlüssel>"]
+                     Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map["lehrer"];
+                */
+
+                sentence = ""; // Sentence wird später angezeigt.
             }
 
-            Environment._VERTRETUNG.add(s);
-            adapter.notifyDataSetChanged();
+            Environment._VERTRETUNG.add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
+            adapter.notifyDataSetChanged(); // Liste aktualisieren
         }
     }
 
-    class Networking extends AsyncTask<String, String, ArrayList<Map<String, String>>> {
+    class Networking extends AsyncTask<String, String, ArrayList<Map<String, String>>> { // Neuer Thread für Herunterladen von Vertretungsplan, damit die App nicht einfriert
         @Override
         protected ArrayList<Map<String, String>> doInBackground(String... strings) {
 
             ArrayList<Map<String, String>> changes = new ArrayList<>();
 
-            for (String URL : strings)
-            {
-                try
-                {
-                    System.out.println("Try connecting to : "+URL);
+            for (String URL : strings) {
+                try {
+                    System.out.println("Try connecting to : " + URL);
                     Document doc = Jsoup.connect(URL).get();
 
-                    for (Element e : doc.body().getAllElements())
-                    {
-                        if (e.tagName().equalsIgnoreCase("table") && e.attributes().get("border").equals("2"))
-                        {
-                            for (Element tr : e.getAllElements())
-                            {
-                                if (tr.tagName().equalsIgnoreCase("tr"))
-                                {
+                    for (Element e : doc.body().getAllElements()) {
+                        if (e.tagName().equalsIgnoreCase("table") && e.attributes().get("border").equals("2")) {
+                            for (Element tr : e.getAllElements()) {
+                                if (tr.tagName().equalsIgnoreCase("tr")) {
                                     Map<String, String> tmp = new HashMap<>();
 
-                                    for (int i = 1; i < tr.getAllElements().size(); i++)
-                                    {
+                                    for (int i = 1; i < tr.getAllElements().size(); i++) {
                                         if (tr.getAllElements().get(i).tagName().equalsIgnoreCase("th"))
                                             continue;
 
@@ -249,12 +257,10 @@ public class MainActivity extends AppCompatActivity {
                                         if (value.equals(""))
                                             break;
 
-                                        if (Environment._MODE == Environment.VPMode.STUDENT)
-                                        {
+                                        if (Environment._MODE == Environment.VPMode.STUDENT) {
                                             tmp.put("type", "student");
 
-                                            switch (i)
-                                            {
+                                            switch (i) {
                                                 case 1:     // Klasse
                                                     tmp.put("klasse", value);
                                                     break;
@@ -279,13 +285,10 @@ public class MainActivity extends AppCompatActivity {
                                                     tmp.put("info", value);
                                                     break;
                                             }
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             tmp.put("type", "teacher");
 
-                                            switch (i)
-                                            {
+                                            switch (i) {
                                                 case 1:     // Lehrer
                                                     tmp.put("lehrer", value);
                                                     break;
@@ -321,35 +324,30 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     }
 
-                                    if (Environment._MODE == Environment.VPMode.STUDENT)
-                                    {
+                                    if (Environment._MODE == Environment.VPMode.STUDENT) {
                                         if (tmp.get("klasse") != null &&
-                                            tmp.get("lehrer") != null &&
-                                            tmp.get("raum") != null &&
-                                            tmp.get("stunde") != null &&
-                                            tmp.get("fach") != null &&
-                                            tmp.get("info") != null)
+                                                tmp.get("lehrer") != null &&
+                                                tmp.get("raum") != null &&
+                                                tmp.get("stunde") != null &&
+                                                tmp.get("fach") != null &&
+                                                tmp.get("info") != null)
                                             changes.add(tmp);
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         if (tmp.get("lehrer") != null &&
-                                            tmp.get("stunde") != null &&
-                                            tmp.get("klasse") != null &&
-                                            tmp.get("neues_fach") != null &&
-                                            tmp.get("neuer_raum") != null &&
-                                            tmp.get("fuer_fach") != null &&
-                                            tmp.get("fuer_lehrer") != null &&
-                                            tmp.get("info") != null)
+                                                tmp.get("stunde") != null &&
+                                                tmp.get("klasse") != null &&
+                                                tmp.get("neues_fach") != null &&
+                                                tmp.get("neuer_raum") != null &&
+                                                tmp.get("fuer_fach") != null &&
+                                                tmp.get("fuer_lehrer") != null &&
+                                                tmp.get("info") != null)
                                             changes.add(tmp);
                                     }
                                 }
                             }
                         }
                     }
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     _error = true;
                     return null;
                 }
