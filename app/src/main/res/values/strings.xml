@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Vertretungsplan</string>
+    <string name="Empty"><![CDATA[<Empty>]]></string>
 </resources>

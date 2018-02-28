@@ -12,9 +12,15 @@
         android:title="Aktualisieren" />
 
     <item
-        android:id="@+id/action_lehrer"
-        android:orderInCategory="200"
+        android:id="@+id/action_teacher"
+        android:orderInCategory="2"
         app:showAsAction="never"
         android:title="Lehrer"/>
+
+    <item
+        android:id="@+id/action_student"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:title="Schüler"/>
 
 </menu>
