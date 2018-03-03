@@ -182,11 +182,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        String t = "Heute";
-
-        if (Environment._DAY == Environment.VPTime.TOMORROW) {
-            t = "Morgen";
-        }
+        String t = Environment.getDay(c.get(Calendar.DAY_OF_WEEK));
 
         Environment._VERTRETUNG.add("Vertretungsplan von " + t + ": " + (c.get(Calendar.DAY_OF_MONTH)) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
 
@@ -203,25 +199,11 @@ public class MainActivity extends AppCompatActivity {
                      raum        - der neue Raum
                      info        - sonstige Info (meist sowas wie "für ILZ mit XYZ"
 
-                     auf einen dieser Werte zugreifen:  map["<Schlüssel>"]
-                     Beispiel:                          sentence = "Diese Klasse hat Vertretung: "+map["klasse"];
+                     auf einen dieser Werte zugreifen:  map.get("<Schlüssel>");
+                     Beispiel:                          sentence = "Diese Klasse hat Vertretung: "+map.get("klasse");
                 */
 
-                //Hinzegefügt von Jonas 28.02.18 23:24
-                map.put("klasse", "9c");
-                map.put("stunde", "1-2");
-                map.put("fach", "Deutsch");
-                map.put("lehrer", "Frau Müller");
-                map.put("raum", "112");
-                map.put("info", "für Mathe Herr Bauer");
-
-                //Lehrer
-                map.put("neues_fach", "Englisch");
-                map.put("fuer_fach", "Mathe");
-                map.put("fuer_lehrer", "Herr Groß");
-
-
-                sentence = "Vertretung: Die Klasse "+map.get("klasse")+" hat in der Stunde "+map.get("stunde")+" im Raum "+map.get("raum")+" "+map.get("fach")+" mit "+map.get("lehrer")+".\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
+                sentence = "( "+map.get("klasse")+" ) Die Klasse "+map.get("klasse")+" hat in der Stunde "+map.get("stunde")+" im Raum "+map.get("raum")+" "+map.get("fach")+" mit "+map.get("lehrer")+".\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
             } else {
                 /* [ Schlüssel ] | [Wert ]
                      lehrer      - Der vertrende Lehrer
@@ -232,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
                      fuer_fach   - Das wach, was die Klasse normalerweise dort hätte
                      fuer_lehrer - Welcher Lehrer ausfällt
 
-                     auf einen dieser Werte zugreifen:  map["<Schlüssel>"]
-                     Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map["lehrer"];
+                     auf einen dieser Werte zugreifen:  map.get("<Schlüssel>");
+                     Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map.get("lehrer");
                 */
 
                 sentence = ""+map.get("lehrer")+" hat "+map.get("neues_fach")+" in der Stunde "+map.get("stunde")+" für die "+map.get("klasse")+" im Raum "+map.get("raum")+" statt "+map.get("fuer_fach")+" mit "+map.get("fuer_lehrer")+"."+"\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
@@ -242,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
             Environment._VERTRETUNG.add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
             adapter.notifyDataSetChanged(); // Liste aktualisieren
         }
+
+        Environment._VERTRETUNG.add("Keine weitere Vertretung.\n(Wird dir keine Vertretung, aber auch kein Error angezeigt, versuch mal auf das Refresh-Symbol zu klicken.");
     }
 
     class Networking extends AsyncTask<String, String, ArrayList<Map<String, String>>> { // Neuer Thread für Herunterladen von Vertretungsplan, damit die App nicht einfriert
