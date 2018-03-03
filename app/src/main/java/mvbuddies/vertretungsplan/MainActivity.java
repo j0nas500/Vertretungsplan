@@ -18,6 +18,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +31,18 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private List<Map<String, String>> _tmp = new ArrayList<Map<String, String>>();
 
+    private void add(String s)
+    {
+        Environment._VERTRETUNG.add(s);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void clear()
+    {
+        Environment._VERTRETUNG.clear();
+        adapter.notifyDataSetChanged();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,24 +54,21 @@ public class MainActivity extends AppCompatActivity {
 
         loadSchedule();
 
-        Environment._VERTRETUNG.clear();
-        Environment._VERTRETUNG.add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
-        adapter.notifyDataSetChanged();
+        clear();
+        add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
 
         ToggleButton n = (ToggleButton) findViewById(R.id.morgenheute);
         n.setChecked(false);
         n.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Environment._VERTRETUNG.clear();
-
                 if (Environment._DAY == Environment.VPTime.TODAY)
                     Environment._DAY = Environment.VPTime.TOMORROW;
                 else
                     Environment._DAY = Environment.VPTime.TODAY;
 
-                Environment._VERTRETUNG.clear();
-                Environment._VERTRETUNG.add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
+                clear();
+                add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
                 adapter.notifyDataSetChanged();
             }
         });
@@ -73,9 +83,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.action_teacher:
                 Environment._MODE = Environment.VPMode.TEACHER;
+                setTitle("Vertretungsplan: Lehrer");
+
+                clear();
+                add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
                 break;
             case R.id.action_student:
                 Environment._MODE = Environment.VPMode.STUDENT;
+                setTitle("Vertretungsplan: Schüler");
+
+                clear();
+                add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
                 break;
         }
         return true;
@@ -138,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 //        String Vertretungsplantoday = new String(String.valueOf(today));
 //        final String datumtoday = dateFormat.format(ctoday.getTime());
 
-        Environment._VERTRETUNG.clear();
+        clear();
         Date d = new Date();
 
         Calendar c = Calendar.getInstance();
@@ -152,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Environment._DAY != Environment.VPTime.TODAY) {
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
-                Environment._VERTRETUNG.add("Kann den Vertretungsplan am Freitag noch nicht laden.\nWelcher Administrator soll den bitte heute schon fertig haben?!");
+                add("Kann den Vertretungsplan am Freitag noch nicht laden.\nWelcher Administrator soll den bitte heute schon fertig haben?!");
                 adapter.notifyDataSetChanged();
                 return;
             }
@@ -188,21 +206,20 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             if (!(new Networking()).execute(URL).get() == true) {
-                Environment._VERTRETUNG.clear();
-                Environment._VERTRETUNG.add("Konnte den Vertretungsplan nicht laden.\nEntweder ist die Verbindung zu schlecht,\ndu hast kein Internet,\noder der Plan existiert nicht mehr.\n\nVielleicht sind auch die Entwickler schuld ;).");
+                clear();
+                add("Konnte den Vertretungsplan nicht laden.\nEntweder ist die Verbindung zu schlecht,\ndu hast kein Internet,\noder der Plan existiert nicht mehr.\n\nVielleicht sind auch die Entwickler schuld ;).");
                 adapter.notifyDataSetChanged();
-                Environment._ERROR = false;
                 return;
             }
         } catch (InterruptedException e) {
-            Environment._VERTRETUNG.clear();
-            Environment._VERTRETUNG.add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x1");
+            clear();
+            add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x1");
 
             adapter.notifyDataSetChanged();
             e.printStackTrace();
         } catch (ExecutionException e) {
-            Environment._VERTRETUNG.clear();
-            Environment._VERTRETUNG.add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x2");
+            clear();
+            add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x2");
 
             adapter.notifyDataSetChanged();
             e.printStackTrace();
@@ -210,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
 
         String t = Environment.getDay(c.get(Calendar.DAY_OF_WEEK));
 
-        Environment._VERTRETUNG.add("Vertretungsplan von " + t + ": " + (c.get(Calendar.DAY_OF_MONTH)) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
+        add("Vertretungsplan von " + t + ": " + (c.get(Calendar.DAY_OF_MONTH)) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
+        adapter.notifyDataSetChanged();
 
         for (Map map : _tmp) {
             System.out.println("=> CHANGE");
@@ -247,11 +265,11 @@ public class MainActivity extends AppCompatActivity {
                 sentence = ""+map.get("lehrer")+" hat "+map.get("neues_fach")+" in der Stunde "+map.get("stunde")+" für die "+map.get("klasse")+" im Raum "+map.get("raum")+" statt "+map.get("fuer_fach")+" mit "+map.get("fuer_lehrer")+"."+"\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
             }
 
-            Environment._VERTRETUNG.add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
+            add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
             adapter.notifyDataSetChanged(); // Liste aktualisieren
         }
 
-        Environment._VERTRETUNG.add("Keine weitere Vertretung.\n(Wird dir keine Vertretung, aber auch kein Error angezeigt, versuch mal auf das Refresh-Symbol zu klicken.");
+        add("Keine weitere Vertretung.\n(Wird dir keine Vertretung, aber auch kein Error angezeigt, versuch mal auf das Refresh-Symbol zu klicken.");
     }
 
     class Networking extends AsyncTask<String, String, Boolean> { // Neuer Thread für Herunterladen von Vertretungsplan, damit die App nicht einfriert
@@ -260,10 +278,10 @@ public class MainActivity extends AppCompatActivity {
 
             ArrayList<Map<String, String>> changes = new ArrayList<>();
 
-            for (String URL : strings) {
+            for (String url : strings) {
                 try {
-                    System.out.println("Try connecting to : " + URL);
-                    Document doc = Jsoup.connect(URL).get();
+                    System.out.println("Try connecting to : " + url);
+                    Document doc = Jsoup.parse(new URL(url).openStream(), "ISO-8859-1", url);
 
                     for (Element e : doc.body().getAllElements()) {
                         if (e.tagName().equalsIgnoreCase("table") && e.attributes().get("border").equals("2")) {
@@ -371,9 +389,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } catch (IOException e) {
-                    Environment._VERTRETUNG.clear();
                     e.printStackTrace();
-                    Environment._ERROR = true;
                     return false;
                 }
             }
