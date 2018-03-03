@@ -31,14 +31,12 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private List<Map<String, String>> _tmp = new ArrayList<Map<String, String>>();
 
-    private void add(String s)
-    {
+    private void add(String s) {
         Environment._VERTRETUNG.add(s);
         adapter.notifyDataSetChanged();
     }
 
-    private void clear()
-    {
+    private void clear() {
         Environment._VERTRETUNG.clear();
         adapter.notifyDataSetChanged();
     }
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         loadSchedule();
 
         clear();
-        add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
+        loadSchedule();
 
         ToggleButton n = (ToggleButton) findViewById(R.id.morgenheute);
         n.setChecked(false);
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     Environment._DAY = Environment.VPTime.TODAY;
 
                 clear();
-                add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
+                loadSchedule();
                 adapter.notifyDataSetChanged();
             }
         });
@@ -86,14 +84,14 @@ public class MainActivity extends AppCompatActivity {
                 setTitle("Vertretungsplan: Lehrer");
 
                 clear();
-                add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
+                loadSchedule();
                 break;
             case R.id.action_student:
                 Environment._MODE = Environment.VPMode.STUDENT;
                 setTitle("Vertretungsplan: Schüler");
 
                 clear();
-                add("Komm schon! Lad die Vertretung! (Auf das Erneuerungssymbol oben rechts klicken, neben den drei Punkten.)");
+                loadSchedule();
                 break;
         }
         return true;
@@ -247,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese Klasse hat Vertretung: "+map.get("klasse");
                 */
 
-                sentence = "( "+map.get("klasse")+" ) Die Klasse "+map.get("klasse")+" hat in der Stunde "+map.get("stunde")+" im Raum "+map.get("raum")+" "+map.get("fach")+" mit "+map.get("lehrer")+".\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
+                sentence = "( " + map.get("klasse") + " ) Die Klasse " + map.get("klasse") + " hat in der Stunde " + map.get("stunde") + " im Raum " + map.get("raum") + " " + map.get("fach") + " mit " + map.get("lehrer") + ".\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
             } else {
                 /* [ Schlüssel ] | [Wert ]
                      lehrer      - Der vertrende Lehrer
@@ -262,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map.get("lehrer");
                 */
 
-                sentence = ""+map.get("lehrer")+" hat "+map.get("neues_fach")+" in der Stunde "+map.get("stunde")+" für die "+map.get("klasse")+" im Raum "+map.get("raum")+" statt "+map.get("fuer_fach")+" mit "+map.get("fuer_lehrer")+"."+"\nInfo: "+map.get("info"); // Sentence wird später angezeigt.
+                sentence = "" + map.get("lehrer") + " hat " + map.get("neues_fach") + " in der Stunde " + map.get("stunde") + " für die " + map.get("klasse") + " im Raum " + map.get("neuer_raum") + " statt " + map.get("fuer_fach") + " mit " + map.get("fuer_lehrer") + "." + "\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
             }
 
             add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
