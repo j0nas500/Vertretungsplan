@@ -368,8 +368,7 @@ public class MainActivity extends AppCompatActivity {
                                                 tmp.get("lehrer") != null &&
                                                 tmp.get("raum") != null &&
                                                 tmp.get("stunde") != null &&
-                                                tmp.get("fach") != null &&
-                                                tmp.get("info") != null)
+                                                tmp.get("fach") != null)
                                             changes.add(tmp);
                                     } else {
                                         if (tmp.get("lehrer") != null &&
@@ -378,8 +377,7 @@ public class MainActivity extends AppCompatActivity {
                                                 tmp.get("neues_fach") != null &&
                                                 tmp.get("neuer_raum") != null &&
                                                 tmp.get("fuer_fach") != null &&
-                                                tmp.get("fuer_lehrer") != null &&
-                                                tmp.get("info") != null)
+                                                tmp.get("fuer_lehrer") != null)
                                             changes.add(tmp);
                                     }
                                 }
