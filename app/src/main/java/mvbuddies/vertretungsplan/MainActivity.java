@@ -364,20 +364,10 @@ public class MainActivity extends AppCompatActivity {
                                     }
 
                                     if (Environment._MODE == Environment.VPMode.STUDENT) {
-                                        if (tmp.get("klasse") != null &&
-                                                tmp.get("lehrer") != null &&
-                                                tmp.get("raum") != null &&
-                                                tmp.get("stunde") != null &&
-                                                tmp.get("fach") != null)
+                                        if (tmp.get("klasse") != null)
                                             changes.add(tmp);
                                     } else {
-                                        if (tmp.get("lehrer") != null &&
-                                                tmp.get("stunde") != null &&
-                                                tmp.get("klasse") != null &&
-                                                tmp.get("neues_fach") != null &&
-                                                tmp.get("neuer_raum") != null &&
-                                                tmp.get("fuer_fach") != null &&
-                                                tmp.get("fuer_lehrer") != null)
+                                        if (tmp.get("lehrer") != null)
                                             changes.add(tmp);
                                     }
                                 }
