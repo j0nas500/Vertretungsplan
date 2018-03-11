@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                      lehrer      - Der vertrende Lehrer
                      stunde      - In welcher Stunde der Lehrer diese Vertretung ausübt
                      klasse      - Mit welcher Klasse er Vertretung hat
-                     neues_fach  - Welches Fach er ausübt (= Schlüssel: raum)
+                     neues_fach  - Welches Fach er ausübt
                      neuer_raum  - Der Raum in dem die Vertretung stattfindet
                      fuer_fach   - Das wach, was die Klasse normalerweise dort hätte
                      fuer_lehrer - Welcher Lehrer ausfällt
