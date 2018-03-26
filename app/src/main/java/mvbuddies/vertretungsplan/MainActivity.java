@@ -1,5 +1,6 @@
 package mvbuddies.vertretungsplan;
 
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -10,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ToggleButton;
 
@@ -17,6 +19,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,12 +30,66 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private List<Map<String, String>> _tmp = new ArrayList<Map<String, String>>();
 
+    public boolean isExternalStorageWritable() {
+        String state = android.os.Environment.getExternalStorageState();
+        if (android.os.Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isExternalStorageReadable() {
+        String state = android.os.Environment.getExternalStorageState();
+        if (android.os.Environment.MEDIA_MOUNTED.equals(state) ||
+                android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+
+
     private void add(String s) {
-        Environment._VERTRETUNG.add(s);
+        if (Environment._ONLY_CLASSES) {
+            boolean found = false;
+
+            for (String tmp : Environment._CLASSES)
+            {
+                if (s.toLowerCase().contains(tmp.toLowerCase()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found)
+                Environment._VERTRETUNG.add(s);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private void add(String s, boolean nocheck) {
+        if (Environment._ONLY_CLASSES && !nocheck) {
+            boolean found = false;
+
+            for (String tmp : Environment._CLASSES)
+            {
+                if (s.toLowerCase().contains(tmp.toLowerCase()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found)
+                Environment._VERTRETUNG.add(s);
+        }
         adapter.notifyDataSetChanged();
     }
 
@@ -43,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Environment._FILES_DIR = this.getFilesDir().getAbsolutePath();
+        System.out.println((new File(Environment._USER_FILE).getAbsolutePath()));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -50,8 +110,16 @@ public class MainActivity extends AppCompatActivity {
         ListView v = findViewById(R.id.list_vp);
         v.setAdapter(adapter);
 
-        loadSchedule();
 
+        File file = new File(Environment._USER_FILE);
+
+        if (!file.exists())
+        {
+            Intent intent = new Intent(this, InitUser.class);
+            startActivity(intent);
+        }
+
+        Environment.loadUser();
         clear();
         loadSchedule();
 
@@ -79,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_refresh:
                 loadSchedule();
                 break;
+
             case R.id.action_teacher:
                 Environment._MODE = Environment.VPMode.TEACHER;
                 setTitle("Vertretungsplan: Lehrer");
@@ -86,12 +155,19 @@ public class MainActivity extends AppCompatActivity {
                 clear();
                 loadSchedule();
                 break;
+
             case R.id.action_student:
                 Environment._MODE = Environment.VPMode.STUDENT;
                 setTitle("Vertretungsplan: Schüler");
 
                 clear();
                 loadSchedule();
+                break;
+
+            case R.id.action_settings:
+                Intent intent = new Intent(this, InitUser.class);
+                Environment._SETTINGS = true;
+                startActivity(intent);
                 break;
         }
         return true;
@@ -115,45 +191,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadSchedule() {
-//        /* ZEIT Bitte nichts verändern */
-//        String untildate = "2017-09-19";
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        Calendar cal = Calendar.getInstance();
-//
-//        try {
-//            cal.setTime(dateFormat.parse(untildate));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        cal.add(Calendar.DAY_OF_YEAR, 1);
-//        String convertedDate = dateFormat.format(cal.getTime());
-//
-//        Date tomorrow = new Date();
-//        Calendar c = Calendar.getInstance();
-//        c.setTime(tomorrow);
-//        c.add(Calendar.DAY_OF_YEAR, 1);
-//
-//        tomorrow = c.getTime();
-//        String Vertretungsplan = new String(String.valueOf(tomorrow));
-//        String datum = dateFormat.format(c.getTime());
-//
-//        Date datetomorrow = new Date();
-//        Calendar ctomorrow = Calendar.getInstance();
-//        ctomorrow.setTime(datetomorrow);
-//        ctomorrow.add(Calendar.DAY_OF_YEAR, 1);
-//        datetomorrow = ctomorrow.getTime();
-//        String Vertretungsplantomorrow = new String(String.valueOf(datetomorrow));
-//        final String datumtomorrow = dateFormat.format(ctomorrow.getTime());
-//
-//        Date today = new Date();
-//        Calendar ctoday = Calendar.getInstance();
-//        ctoday.setTime(today);
-//        ctoday.add(Calendar.DAY_OF_YEAR, 0);
-//        today = ctoday.getTime();
-//        String Vertretungsplantoday = new String(String.valueOf(today));
-//        final String datumtoday = dateFormat.format(ctoday.getTime());
-
         clear();
         Date d = new Date();
 
@@ -168,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Environment._DAY != Environment.VPTime.TODAY) {
             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
-                add("Kann den Vertretungsplan am Freitag noch nicht laden.\nWelcher Administrator soll den bitte heute schon fertig haben?!");
+                add("Kann den Vertretungsplan am Freitag noch nicht laden.\nWelcher Administrator soll den bitte heute schon fertig haben?!", true);
                 adapter.notifyDataSetChanged();
                 return;
             }
@@ -225,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
 
         String t = Environment.getDay(c.get(Calendar.DAY_OF_WEEK));
 
-        add("Vertretungsplan von " + t + ": " + (c.get(Calendar.DAY_OF_MONTH)) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR));
+        add("Vertretungsplan von " + t + ": " + (c.get(Calendar.DAY_OF_MONTH)) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR), true);
         adapter.notifyDataSetChanged();
 
         for (Map map : _tmp) {
@@ -245,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese Klasse hat Vertretung: "+map.get("klasse");
                 */
 
-                sentence = "( " + map.get("klasse") + " ) Die Klasse " + map.get("klasse") + " hat in der Stunde " + map.get("stunde") + " im Raum " + map.get("raum") + " " + map.get("fach") + " mit " + map.get("lehrer") + ".\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
+                sentence = "( " + map.get("klasse") + " ) Die Klasse " + map.get("klasse") + " hat in der Stunde " + map.get("stunde") + " im Raum " + map.get("raum") + " das Fach " + map.get("fach") + " mit " + map.get("lehrer") + ".\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
             } else {
                 /* [ Schlüssel ] | [Wert ]
                      lehrer      - Der vertrende Lehrer
@@ -260,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                      Beispiel:                          sentence = "Diese/r Lehrer/in hat Vertretung: "+map.get("lehrer");
                 */
 
-                sentence = "" + map.get("lehrer") + " hat " + map.get("neues_fach") + " in der Stunde " + map.get("stunde") + " für die " + map.get("klasse") + " im Raum " + map.get("neuer_raum") + " statt " + map.get("fuer_fach") + " mit " + map.get("fuer_lehrer") + "." + "\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
+                sentence = map.get("lehrer") + " hat das Fach " + map.get("neues_fach") + " in der Stunde " + map.get("stunde") + " für die Klasse " + map.get("klasse") + " im Raum " + map.get("neuer_raum") + " statt dem Fach " + map.get("fuer_fach") + " vertretend für "+(map.get("fuer_lehrer").toString().trim().startsWith("Frau") ? "die Lehrerin" : "den Lehrer")+" " + map.get("fuer_lehrer") + "." + "\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
             }
 
             add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
@@ -294,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
                                         String value = tr.getAllElements().get(i).text();
 
                                         if (value.equals(""))
-                                            break;
+                                            value = "<Keine Angabe>";
 
                                         if (Environment._MODE == Environment.VPMode.STUDENT) {
                                             tmp.put("type", "student");

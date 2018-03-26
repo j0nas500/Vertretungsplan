@@ -23,4 +23,10 @@
         app:showAsAction="never"
         android:title="Schüler"/>
 
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="1"
+        android:title="Einstellungen"
+        app:showAsAction="never" />
+
 </menu>
