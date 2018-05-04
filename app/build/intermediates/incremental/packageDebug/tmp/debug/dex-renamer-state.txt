@@ -1,0 +1,13 @@
+#Fri May 04 22:49:15 CEST 2018
+path.3=classes.dex
+path.2=classes.dex
+path.1=classes.dex
+path.0=classes.dex
+renamed.3=classes4.dex
+renamed.2=classes3.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+base.3=/run/media/survari/Survari/Projekte/Android/AndroidStudioProjects/Vertretungsplan/app/build/intermediates/transforms/dexMerger/debug/14
+base.2=/run/media/survari/Survari/Projekte/Android/AndroidStudioProjects/Vertretungsplan/app/build/intermediates/transforms/dexMerger/debug/11
+base.1=/run/media/survari/Survari/Projekte/Android/AndroidStudioProjects/Vertretungsplan/app/build/intermediates/transforms/dexMerger/debug/12
+base.0=/run/media/survari/Survari/Projekte/Android/AndroidStudioProjects/Vertretungsplan/app/build/intermediates/transforms/dexMerger/debug/13

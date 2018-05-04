@@ -26,7 +26,8 @@
         <activity
             android:name=".InitUser"
             android:label="@string/title_activity_init_user"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".InfoActivity"></activity>
     </application>
 
 </manifest>

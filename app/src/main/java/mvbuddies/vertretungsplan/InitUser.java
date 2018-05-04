@@ -27,6 +27,7 @@ public class InitUser extends AppCompatActivity {
         final EditText et_class = (EditText) findViewById(R.id.et_class);
         final EditText et_name = (EditText) findViewById(R.id.et_name);
         final CheckBox cb_class = (CheckBox) findViewById(R.id.cb_class);
+        final CheckBox cb_byname = (CheckBox) findViewById(R.id.cb_byname);
 
         if (Environment._SETTINGS) {
             try {
@@ -34,6 +35,7 @@ public class InitUser extends AppCompatActivity {
                     et_class.setText(jo.getString("classes"), TextView.BufferType.EDITABLE);
                     et_name.setText(jo.getString("name"), TextView.BufferType.EDITABLE);
                     cb_class.setChecked(jo.getBoolean("yn"));
+                    cb_byname.setChecked(jo.getBoolean("byname"));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -43,7 +45,8 @@ public class InitUser extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Environment.saveUser(et_name.getText(), et_class.getText(), cb_class.isChecked());
+               Environment.saveUser(et_name.getText(), et_class.getText(), cb_class.isChecked(), cb_byname.isChecked());
+               Environment.loadUser();
                finish();
             }
         });

@@ -18,15 +18,19 @@
         android:title="Lehrer"/>
 
     <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="3"
+        android:title="Einstellungen" />
+    <item
         android:id="@+id/action_student"
         android:orderInCategory="1"
         app:showAsAction="never"
         android:title="Schüler"/>
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="1"
-        android:title="Einstellungen"
-        app:showAsAction="never" />
+        android:id="@+id/action_Info"
+        android:orderInCategory="4"
+        app:showAsAction="never"
+        android:title="Info"/>
 
 </menu>

@@ -1,6 +1,7 @@
 package mvbuddies.vertretungsplan;
 
 import android.content.Intent;
+import android.icu.text.IDNA;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -13,8 +14,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -70,7 +73,23 @@ public class MainActivity extends AppCompatActivity {
 
             if (found)
                 Environment._VERTRETUNG.add(s);
+            adapter.notifyDataSetChanged();
+            return;
         }
+
+        if (Environment._BY_NAME) {
+            try {
+                if (s.toLowerCase().contains(Environment.getUser().getString("name"))) {
+                    Environment._VERTRETUNG.add(s);
+                    adapter.notifyDataSetChanged();
+                    return;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Environment._VERTRETUNG.add(s);
         adapter.notifyDataSetChanged();
     }
 
@@ -145,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
+                Environment.loadUser();
+                clear();
                 loadSchedule();
                 break;
 
@@ -168,6 +189,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, InitUser.class);
                 Environment._SETTINGS = true;
                 startActivity(intent);
+                break;
+
+            case R.id.action_Info:
+                Intent t4 = new Intent(this, InfoActivity.class);
+                startActivity(t4);
                 break;
         }
         return true;
@@ -266,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         for (Map map : _tmp) {
-            System.out.println("=> CHANGE");
             String sentence = "";
 
             if (Environment._MODE == Environment.VPMode.STUDENT) { // Schauen ob "Schüler" asugewählt wurde

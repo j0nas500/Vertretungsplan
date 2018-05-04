@@ -32,6 +32,7 @@ import java.util.List;
 public class Environment {
     public static boolean _SETTINGS = false;
     public static boolean _ONLY_CLASSES = false;
+    public static boolean _BY_NAME = false;
     public static String _FILES_DIR = "";
     public static List<String> _CLASSES = new ArrayList<String>();
     public static String _USER_FILE = "/data/data/mvbuddies.vertretungsplan/files/user.json";
@@ -57,7 +58,7 @@ public class Environment {
         }
     }
 
-    public static void saveUser(Editable _name, Editable _class, boolean checked) {
+    public static void saveUser(Editable _name, Editable _class, boolean checked, boolean byname) {
         File f = new File(_USER_FILE);
 
         if (f.exists())
@@ -68,6 +69,7 @@ public class Environment {
             jo.put("name", _name.toString());
             jo.put("classes", _class.toString());
             jo.put("yn", checked);
+            jo.put("byname", byname);
 
             BufferedWriter outputStream;
 
@@ -142,6 +144,7 @@ public class Environment {
 
             jo = new JSONObject(ret);
             _ONLY_CLASSES = jo.getBoolean("yn");
+            _BY_NAME = jo.getBoolean("byname");
             _CLASSES = Arrays.asList((jo.getString("classes")).split(", "));
         }
         catch (FileNotFoundException e) {
