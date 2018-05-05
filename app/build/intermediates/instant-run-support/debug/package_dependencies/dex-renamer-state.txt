@@ -1,4 +1,0 @@
-#Mon Mar 26 10:00:47 CEST 2018
-base.0=/run/media/survari/Survari/Projekte/Android/AndroidStudioProjects/Vertretungsplan/app/build/intermediates/transforms/dexMerger/debug/105
-path.0=classes.dex
-renamed.0=classes.dex

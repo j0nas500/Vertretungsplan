@@ -58,7 +58,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void add(String s) {
+    private void add(String s, boolean nocheck) {
+        if (nocheck) {
+            Environment._VERTRETUNG.add(s);
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
+        if (Environment._BY_NAME) {
+            try {
+                String name = Environment.getUser().getString("name");
+                System.out.println("BYNAME: \""+s+"\" contains? "+Environment.getUser().getString("name"));
+                if (s.toLowerCase().replace(" ", "").contains(name.toLowerCase().trim().split(" ")[name.toLowerCase().trim().split(" ").length-1])) {
+                    Environment._VERTRETUNG.add(s);
+                    adapter.notifyDataSetChanged();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return;
+        }
+
         if (Environment._ONLY_CLASSES) {
             boolean found = false;
 
@@ -77,38 +98,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (Environment._BY_NAME) {
-            try {
-                if (s.toLowerCase().contains(Environment.getUser().getString("name"))) {
-                    Environment._VERTRETUNG.add(s);
-                    adapter.notifyDataSetChanged();
-                    return;
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
         Environment._VERTRETUNG.add(s);
-        adapter.notifyDataSetChanged();
-    }
-
-    private void add(String s, boolean nocheck) {
-        if (Environment._ONLY_CLASSES && !nocheck) {
-            boolean found = false;
-
-            for (String tmp : Environment._CLASSES)
-            {
-                if (s.toLowerCase().contains(tmp.toLowerCase()))
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found)
-                Environment._VERTRETUNG.add(s);
-        }
         adapter.notifyDataSetChanged();
     }
 
@@ -268,19 +258,19 @@ public class MainActivity extends AppCompatActivity {
         try {
             if (!(new Networking()).execute(URL).get() == true) {
                 clear();
-                add("Konnte den Vertretungsplan nicht laden.\nEntweder ist die Verbindung zu schlecht,\ndu hast kein Internet,\noder der Plan existiert nicht mehr.\n\nVielleicht sind auch die Entwickler schuld ;).");
+                add("Konnte den Vertretungsplan nicht laden.\nEntweder ist die Verbindung zu schlecht,\ndu hast kein Internet,\noder der Plan existiert nicht mehr.\n\nVielleicht sind auch die Entwickler schuld ;).", true);
                 adapter.notifyDataSetChanged();
                 return;
             }
         } catch (InterruptedException e) {
             clear();
-            add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x1");
+            add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x1", true);
 
             adapter.notifyDataSetChanged();
             e.printStackTrace();
         } catch (ExecutionException e) {
             clear();
-            add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x2");
+            add("Etwas hat nicht funktioniert. Diese Nachricht sollte nicht angezeigt werden. Informiere die Entwickler.\nFehlercode: 0x2", true);
 
             adapter.notifyDataSetChanged();
             e.printStackTrace();
@@ -325,11 +315,11 @@ public class MainActivity extends AppCompatActivity {
                 sentence = map.get("lehrer") + " hat das Fach " + map.get("neues_fach") + " in der Stunde " + map.get("stunde") + " für die Klasse " + map.get("klasse") + " im Raum " + map.get("neuer_raum") + " statt dem Fach " + map.get("fuer_fach") + " vertretend für "+(map.get("fuer_lehrer").toString().trim().startsWith("Frau") ? "die Lehrerin" : "den Lehrer")+" " + map.get("fuer_lehrer") + "." + "\nInfo: " + map.get("info"); // Sentence wird später angezeigt.
             }
 
-            add(sentence); // Sentence wird zur Liste der Vertretungen hinzugefügt
+            add(sentence, false); // Sentence wird zur Liste der Vertretungen hinzugefügt
             adapter.notifyDataSetChanged(); // Liste aktualisieren
         }
 
-        add("Keine weitere Vertretung.\n(Wird dir keine Vertretung, aber auch kein Error angezeigt, versuch mal auf das Refresh-Symbol zu klicken.");
+        add("Keine weitere Vertretung.\n(Wird dir keine Vertretung, aber auch kein Error angezeigt, versuch mal auf das Refresh-Symbol zu klicken oder deine Einstellungen zu überprüfen.)", true);
     }
 
     class Networking extends AsyncTask<String, String, Boolean> { // Neuer Thread für Herunterladen von Vertretungsplan, damit die App nicht einfriert
