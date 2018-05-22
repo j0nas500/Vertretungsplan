@@ -17,9 +17,10 @@ public class InfoActivity extends AppCompatActivity {
                 "    Tristan Pieper (8b)\n" +
                 "    Jonas Klugmann (9c)\n" +
                 "    Bjarne Bötcher (9c)\n" +
+				"	 Adrian Hammermeister (9c)\n" +
                 "\n" +
                 "Fehler bitte so schnell wie möglich an diese Personen melden, solange es nicht nur Verbindungsstörungen sind. Dafür können die Entwickler (meistens) nichts.\n" +
                 "\n" +
-                "Letzte aktualisierung dieser Daten: Mai 2018.");
+                "Letzte Aktualisierung dieser Daten: Mai 2018.");
     }
 }
