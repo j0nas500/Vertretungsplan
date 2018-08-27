@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -114,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+
 
         adapter = new ArrayAdapter<String>(this, R.layout.list_view, R.id.txtitem, Environment._VERTRETUNG);
         ListView v = findViewById(R.id.list_vp);

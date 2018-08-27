@@ -58,7 +58,7 @@ public class Environment {
         }
     }
 
-    public static void saveUser(Editable _name, Editable _class, boolean checked, boolean byname) {
+    public static void saveUser(Editable _name, Editable _class, boolean checked, boolean byname, boolean notification) {
         File f = new File(_USER_FILE);
 
         if (f.exists())
@@ -70,6 +70,7 @@ public class Environment {
             jo.put("classes", _class.toString());
             jo.put("yn", checked);
             jo.put("byname", byname);
+            jo.put("notification", notification);
 
             BufferedWriter outputStream;
 

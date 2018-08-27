@@ -11,8 +11,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static mvbuddies.vertretungsplan.R.id.cb_notification;
 
 public class InitUser extends AppCompatActivity {
 
@@ -28,6 +31,7 @@ public class InitUser extends AppCompatActivity {
         final EditText et_name = (EditText) findViewById(R.id.et_name);
         final CheckBox cb_class = (CheckBox) findViewById(R.id.cb_class);
         final CheckBox cb_byname = (CheckBox) findViewById(R.id.cb_byname);
+        final CheckBox cb_notification = (CheckBox) findViewById(R.id.cb_notification);
 
         if (Environment._SETTINGS) {
             try {
@@ -36,6 +40,7 @@ public class InitUser extends AppCompatActivity {
                     et_name.setText(jo.getString("name"), TextView.BufferType.EDITABLE);
                     cb_class.setChecked(jo.getBoolean("yn"));
                     cb_byname.setChecked(jo.getBoolean("byname"));
+                    cb_notification.setChecked(jo.getBoolean("notification"));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -45,11 +50,26 @@ public class InitUser extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Environment.saveUser(et_name.getText(), et_class.getText(), cb_class.isChecked(), cb_byname.isChecked());
+               Environment.saveUser(et_name.getText(), et_class.getText(), cb_class.isChecked(), cb_byname.isChecked(), cb_notification.isChecked());
                Environment.loadUser();
                finish();
             }
         });
     }
+    //Checkbox ob benachrichtigt werden oder nicht
+    public void onCheckboxClicked(View view) {
+        boolean checked = ((CheckBox) view).isChecked();
 
+        //Checkt welche Checkbox checked ist
+        switch (view.getId()) {
+            case R.id.cb_notification:
+                if (checked)
+                    //Benachrichtigung an:
+                    FirebaseMessaging.getInstance().subscribeToTopic("Benachrichtigung");
+                else
+                    //Benachrichtigung aus:
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic("Benachrichtigung");
+                break;
+        }
+    }
 }

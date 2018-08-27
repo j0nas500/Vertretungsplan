@@ -29,5 +29,11 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
+    <CheckBox
+            android:text="Erinner mich immer Abends an dern Vertretungsplan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/cb_notification"
+            android:onClick="onCheckboxClicked"
+            android:layout_marginTop="280dp"/>
 
 </android.support.design.widget.CoordinatorLayout>
